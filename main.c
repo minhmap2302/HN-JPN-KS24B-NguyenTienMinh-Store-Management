@@ -11,14 +11,15 @@ struct Supplements {
 struct Item {
     int id;
     char name[100];
-    int price;
+    float price;
     int quan;
 };
 
+void deleItem(struct Item a[], int *b);
+void repairItem(struct Item a[], int *b);
 void clearScreen();
 void sortItem(struct Item a[], int *b);
 void searchItem(struct Item a[], int *b);
-void showMenuuItem();
 void categoryAndProduct(struct Supplements m[], int *n, struct Item a[], int *b);
 void showMenuuu();
 void showMenuu();
@@ -109,7 +110,6 @@ int accountAdmin(int *userChoice, int *lock) {
     printf("Enter admin: ");
     scanf("%s", inputAdmin);
     getchar();
-
     printf("Enter password: ");
     while (1) {
         ch = getch();
@@ -481,12 +481,15 @@ void product(struct Item a[], int *b) {
                 printItem(a, b);
                 break;
             case 3:
-            	searchItem(a,b);
-            	saveItem(a, b);
+            	repairItem(a,b);
+            	saveItem(a,b);
             	break;
             case 4:
+            	deleItem(a,b);
+            	saveItem(a,b);
             	break;
             case 5:
+            	searchItem(a,b);
             	break;
             case 6:
             	sortItem(a, b);
@@ -528,7 +531,6 @@ void loadItem(struct Item a[], int *b) {
 
 void addItem(struct Item *a, int *b) {
     int count;
-    char temp[100];
     printf("Enter the number of items to add: ");
     scanf("%d", &count);
     getchar();
@@ -538,68 +540,55 @@ void addItem(struct Item *a, int *b) {
         printf("Enter the name of the item: ");
         fgets(a[*b].name, 100, stdin);
         a[*b].name[strcspn(a[*b].name, "\n")] = '\0';
-        fflush(stdin);
         printf("Enter price for %s: ", a[*b].name);
         scanf("%f", &a[*b].price);
         getchar();
         printf("Enter quantity for %s: ", a[*b].name);
         scanf("%d", &a[*b].quan);
-        (*b)++;	
+        getchar();
+        (*b)++;
     }
     printf("Added %d new items successfully.\n", count);
 }
 
 void printItem(struct Item a[], int *b) {
-    if (*b == NULL) {
+    if (*b == 0) {
         printf("No products available to display.\n");
         return;
     }
-    printf("*===========|===========================|=======|========*\n");
-    printf("|    ID     |       Name Product        | Spice | Quan   |\n");
-    printf("*===========|===========================|=======|========*\n");
+    printf("*===========|===========================|========|==========*\n");
+    printf("|    ID     |       Name Product        | Price  | Quantity |\n");
+    printf("*===========|===========================|========|==========*\n");
     for (int i = 0; i < *b; i++) {
-        printf("|%6d     | %-25s | %5d | %6d |\n", a[i].id, a[i].name, a[i].price, a[i].quan);
+        printf("|%6d     | %-25s | %5.2f | %6d |\n", a[i].id, a[i].name, a[i].price, a[i].quan);
     }
-    printf("*===========|===========================|=======|========*\n");
+    printf("*===========|===========================|========|==========*\n");
 }
 
 void searchItem(struct Item a[], int *b) {
     char m;
     int found = 0;
     if (*b == 0) {
-        printf("No supplements available to search.\n");
+        printf("No products available to search.\n");
         return;
     }
     printf("Enter a character to search: ");
     getchar();
     scanf("%c", &m);
     printf("\nSearch Results:\n");
-    printf("*===========|===========================*\n");
-    printf("|    ID     |       Name Supplements    |\n");
-    printf("*===========|===========================*\n");
+    printf("*===========|===========================|=========|==========*\n");
+    printf("|    ID     |       Name Product        | Price   | Quantity |\n");
+    printf("*===========|===========================|=========|==========*\n");
     for (int i = 0; i < *b; i++) {
         if (strchr(a[i].name, m) != NULL) {
-            printf("|%6d     | %-25s |\n", a[i].id, a[i].name);
+            printf("|%6d     | %-25s | %5.2f | %6d |\n", a[i].id, a[i].name, a[i].price, a[i].quan);
             found = 1;
         }
     }
-    if (found == 0) {
-        printf("No supplements found with the character '%c'.\n", m);
+    if (!found) {
+        printf("| No products found matching '%c'.                          |\n", m);
     }
-    printf("*===========|===========================*\n");
-}
-
-void showMenuuItem() {
-    printf(" * SUPPLEMENTS FOR THE RICH *\n");
-    printf("=============================\n");
-    printf("\t GYM MENU \n");
-    printf("=============================\n");
-    printf("| [1].Add A New Products. 	|\n");
-    printf("| [2].Show All Products.  	|\n");
-    printf("| [3].Search Products.    	|\n");
-    printf("| [4].Sort Products.      	|\n");
-    printf("| [5].Exit The Program.     |\n");
-    printf("=============================\n");
+    printf("*===========|===========================|=========|==========*\n");
 }
 
 void sortItem(struct Item a[], int *b) {
@@ -620,4 +609,76 @@ void sortItem(struct Item a[], int *b) {
     printf("Products sorted by name successfully.\n");
 }
 
+void repairItem(struct Item a[], int *b) {
+    int id;
+    int found = 0;
+    if (*b == 0) {
+        printf("No items available to repair.\n");
+        return;
+    }
+    printf("Enter the ID of the item you want to repair: ");
+    scanf("%d", &id);
+    for (int i = 0; i < *b; i++) {
+        if (a[i].id == id) {
+            found = 1;
+            printf("Current Details:\n");
+            printf("*===========|===========================|=========|==========*\n");
+            printf("|    ID     |       Name Product        | Price   | Quantity |");
+            printf("*===========|===========================|=========|==========*\n");
+            printf("|%6d     | %-25s | %5.2f | %6d |\n", a[i].id, a[i].name, a[i].price, a[i].quan);
+            printf("*===========|===========================|=========|==========*\n");
+            printf("Enter new name for the item: ");
+            getchar();
+            fgets(a[i].name, 100, stdin);
+            a[i].name[strcspn(a[i].name, "\n")] = '\0';
+            printf("Enter new price for the item: ");
+            scanf("%f", &a[i].price);
+            printf("Enter new quantity for the item: ");
+            scanf("%d", &a[i].quan);
+            printf("Item ID %d has been updated successfully.\n", a[i].id);
+            return;
+        }
+    }
+    if (!found) {
+        printf("No item found with ID %d.\n", id);
+    }
+}
 
+void deleItem(struct Item a[], int *b) {
+    int id;
+    int confirm;
+    int found = 0;
+    if (*b == 0) {
+        printf("No items available to delete.\n");
+        return;
+    }
+    printf("Enter the ID of the item you want to delete: ");
+    scanf("%d", &id);
+    for (int i = 0; i < *b; i++) {
+        if (a[i].id == id) {
+            found = 1;
+            printf("Found Item:\n");
+            printf("*===========|===========================|=========|==========*\n");
+            printf("|    ID     |       Name Product        | Price   | Quantity |");
+            printf("*===========|===========================|=========|==========*\n");
+            printf("|%6d     | %-25s | %5.2f | %6d |\n", a[i].id, a[i].name, a[i].price, a[i].quan);
+            printf("*===========|===========================|=========|==========*\n");
+            printf("Do you want to delete this item? (1 = Yes, 2 = No): ");
+            scanf("%d", &confirm);
+            if (confirm == 1) {
+                for (int j = i; j < *b - 1; j++) {
+                    a[j] = a[j + 1];
+                    a[j].id = j + 1;
+                }
+                (*b)--;
+                printf("Item with ID %d deleted successfully.\n", id);
+            } else {
+                printf("Delete operation cancelled.\n");
+            }
+            return;
+        }
+    }
+    if (!found) {
+        printf("No item found with ID %d.\n", id);
+    }
+}
